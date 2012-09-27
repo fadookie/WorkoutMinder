@@ -8,6 +8,9 @@
 	<script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
     <script>
         var count = 0;
+        var sCountdownTimer = 0;
+        var countdownCompletionHandler;
+        var sDefaultCountdown = 5;
 
         $(document).bind('pageinit', function() {
             //$("#counter").buttonMarkup({corners: false});
@@ -18,7 +21,39 @@
                 $("#counter").val(count);
                 $("#counter").button('refresh');
             });
+
+            startCountdown();
         });
+
+        function startCountdown(completionHandler) {
+            sCountdownTimer = sDefaultCountdown;
+
+            if (completionHandler) {
+                //use supplied handler
+                countdownCompletionHandler = completionHandler;
+            } else {
+                //use default handler
+                countdownCompletionHandler = stopCountdown;
+            }
+
+            countdownTick();
+        }
+
+        function stopCountdown() {
+            console.log("sc Countdown complete.");
+        }
+
+        function countdownTick() {
+            sCountdownTimer--;
+            if (sCountdownTimer > 0) {
+                console.log(sCountdownTimer);
+                setTimeout(countdownTick, 1000);
+            } else {
+                console.log("reset timer");
+                sCountdownTimer = sDefaultCountdown;
+                countdownCompletionHandler();
+            }
+        }
     </script>
 </head> 
 <body> 
