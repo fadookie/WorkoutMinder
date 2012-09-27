@@ -1,0 +1,46 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<title>My Page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
+	<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+    <script>
+        var count = 0;
+
+        $(document).bind('pageinit', function() {
+            //$("#counter").buttonMarkup({corners: false});
+            //console.log("count = " + count);
+
+            $("#counter").bind("vclick", function(event, ui) {
+                count++;
+                $("#counter").val(count);
+                $("#counter").button('refresh');
+            });
+        });
+    </script>
+</head> 
+<body> 
+
+<div data-role="page">
+
+	<div data-role="header">
+		<h1>My Title</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+		<p>Hello world</p>		
+<input type="button" value="0" id="counter" />
+        <!--<a href="#" data-role="button" data-icon="star" id="counter">0</a>-->
+        <ul data-role="listview" data-inset="true" data-filter="true">
+            <li><a href="#">Test Item 1</a></li>
+            <li><a href="#">Test Item 2</a></li>
+        </ul>
+
+	</div><!-- /content -->
+
+</div><!-- /page -->
+
+</body>
+</html>
