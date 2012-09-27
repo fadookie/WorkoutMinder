@@ -7,26 +7,30 @@
 	<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
     <script>
-        var count = 0;
+        var repCounter = 0;
         var sCountdownTimer = 0;
         var countdownCompletionHandler;
-        var sDefaultCountdown = 5;
+        var sDefaultCountdownDuration = 30;
 
         $(document).bind('pageinit', function() {
-            //$("#counter").buttonMarkup({corners: false});
-            //console.log("count = " + count);
+            //$("#repCounter").buttonMarkup({corners: false});
+            //console.log("repCounter = " + repCounter);
 
-            $("#counter").bind("vclick", function(event, ui) {
-                count++;
-                $("#counter").val(count);
-                $("#counter").button('refresh');
+            $("#repCounter").bind("vclick", function(event, ui) {
+                repCounter++;
+                $("#repCounter").val(repCounter);
+                $("#repCounter").button('refresh');
             });
 
-            startCountdown();
+            startCountdown(5);
         });
 
-        function startCountdown(completionHandler) {
-            sCountdownTimer = sDefaultCountdown;
+        function startCountdown(sDuration, completionHandler) {
+            if (sDuration) {
+                sCountdownTimer = sDuration;
+            } else {
+                sCountdownTimer = sDefaultCountdownDuration;
+            }
 
             if (completionHandler) {
                 //use supplied handler
@@ -50,7 +54,7 @@
                 setTimeout(countdownTick, 1000);
             } else {
                 console.log("reset timer");
-                sCountdownTimer = sDefaultCountdown;
+                sCountdownTimer = sDefaultCountdownDuration;
                 countdownCompletionHandler();
             }
         }
@@ -66,8 +70,8 @@
 
 	<div data-role="content">	
 		<p>Hello world</p>		
-<input type="button" value="0" id="counter" />
-        <!--<a href="#" data-role="button" data-icon="star" id="counter">0</a>-->
+<input type="button" value="0" id="repCounter" />
+        <!--<a href="#" data-role="button" data-icon="star" id="repCounter">0</a>-->
         <ul data-role="listview" data-inset="true" data-filter="true">
             <li><a href="#">Test Item 1</a></li>
             <li><a href="#">Test Item 2</a></li>
