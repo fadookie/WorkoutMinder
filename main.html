@@ -7,22 +7,68 @@
 	<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
     <script>
-        var repCounter = 0;
+        //Constructor 
+        var CounterWorkout = function(name, repsMax) {
+            this.name = name;
+            this.reps = 0;
+            this.repsMax = repsMax;
+        }
+
+        var CountdownTimerWorkout = function(name, sDuration) {
+            this.name = name;
+            this.sDuration = sDuration;
+
+            this.start = function() {
+                this.sCurrent = this.sDuration;
+                this.fCountdown();
+            }
+
+            this.completionHandler = function() {
+                console.log (this.name + " countdown complete");
+            }
+
+            this.fCountdown = function() {
+                this.sCurrent--;
+                obj = this;
+                if (this.sCurrent > 0) {
+                    console.log(this.name + " " + this.sCurrent);
+                    setTimeout(function(){obj.fCountdown();}, 1000); //We have to use an upvalue since 'this' will refer to the window when called by setTimeout
+                } else {
+                    //console.log(this.name + " reset timer");
+                    if (this.completionHandler) {
+                        this.completionHandler();
+                    }
+                }
+            }
+        }
+
+        //Set default properties for objects made by Circle() by modifying its prototype
+        /*
+        CounterWorkout.prototype.reps = function() {
+            return Math.PI*this.radius*this.radius;
+        }
+        */
+    </script>
+    <script>
+        var repsCounter = 0;
         var sCountdownTimer = 0;
         var countdownCompletionHandler;
         var sDefaultCountdownDuration = 30;
 
         $(document).bind('pageinit', function() {
-            //$("#repCounter").buttonMarkup({corners: false});
-            //console.log("repCounter = " + repCounter);
+            //$("#repsCounter").buttonMarkup({corners: false});
+            //console.log("repsCounter = " + repsCounter);
 
-            $("#repCounter").bind("vclick", function(event, ui) {
-                repCounter++;
-                $("#repCounter").val(repCounter);
-                $("#repCounter").button('refresh');
+            $("#repsCounter").bind("vclick", function(event, ui) {
+                repsCounter++;
+                $("#repsCounter").val(repsCounter);
+                $("#repsCounter").button('refresh');
             });
 
-            startCountdown(5);
+            //startCountdown(5);
+
+            var cdtw1 = new CountdownTimerWorkout("Hand stretch",5);
+            cdtw1.start();
         });
 
         function startCountdown(sDuration, completionHandler) {
@@ -42,22 +88,6 @@
 
             countdownTick();
         }
-
-        function stopCountdown() {
-            console.log("sc Countdown complete.");
-        }
-
-        function countdownTick() {
-            sCountdownTimer--;
-            if (sCountdownTimer > 0) {
-                console.log(sCountdownTimer);
-                setTimeout(countdownTick, 1000);
-            } else {
-                console.log("reset timer");
-                sCountdownTimer = sDefaultCountdownDuration;
-                countdownCompletionHandler();
-            }
-        }
     </script>
 </head> 
 <body> 
@@ -70,8 +100,8 @@
 
 	<div data-role="content">	
 		<p>Hello world</p>		
-<input type="button" value="0" id="repCounter" />
-        <!--<a href="#" data-role="button" data-icon="star" id="repCounter">0</a>-->
+<input type="button" value="0" id="repsCounter" />
+        <!--<a href="#" data-role="button" data-icon="star" id="repsCounter">0</a>-->
         <ul data-role="listview" data-inset="true" data-filter="true">
             <li><a href="#">Test Item 1</a></li>
             <li><a href="#">Test Item 2</a></li>
