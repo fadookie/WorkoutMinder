@@ -8,7 +8,7 @@
 	<script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
     <script>
         //Constructor 
-        var CounterWorkout = function(name, repsMax) {
+        var Counter = function(name, repsMax, completionHandler) {
             this.name = name;
             this.reps = 0;
             this.repsMax = repsMax;
@@ -23,12 +23,10 @@
                 }
             }
 
-            this.completionHandler = function(reps) {
-                console.log (this.name + " counter complete at" + reps);
-            }
+            this.completionHandler = completionHandler;
         }
 
-        var CountdownTimerWorkout = function(name, sDuration) {
+        var CountdownTimer = function(name, sDuration, completionHandler, tickHandler) {
             this.name = name;
             this.sDuration = sDuration;
 
@@ -37,25 +35,21 @@
                 this.fCountdown();
             }
 
-            this.completionHandler = function() {
-                console.log (this.name + " countdown complete");
-            }
+            this.completionHandler = completionHandler;
 
-            this.tickHandler = function(sCurrent) {
-                //console.log(this.name + " tick: " + sCurrent);
-            }
+            this.tickHandler = tickHandler;
 
 
             this.fCountdown = function() {
                 this.sCurrent--;
-                obj = this;
 
                 if (this.tickHandler) {
                     this.tickHandler(this.getDate());
                 }
 
                 if (this.sCurrent > 0) {
-                    setTimeout(function(){obj.fCountdown();}, 1000); //We have to use an upvalue since 'this' will refer to the window when called by setTimeout
+                    obj = this; //We have to use an upvalue since 'this' will refer to the window when called by setTimeout
+                    setTimeout(function(){obj.fCountdown();}, 1000);
                 } else {
                     //console.log(this.name + " reset timer");
                     if (this.completionHandler) {
@@ -74,7 +68,7 @@
 
         //Set default properties for objects made by Circle() by modifying its prototype
         /*
-        CounterWorkout.prototype.reps = function() {
+        Counter.prototype.reps = function() {
             return Math.PI*this.radius*this.radius;
         }
         */
@@ -91,20 +85,23 @@
             (function() {
                 var index = 0;
                 var element = $("#countdownTimer_"+index);
-                countdownTimers[index] = new CountdownTimerWorkout("Hand stretch out", 4);
 
-                countdownTimers[index].tickHandler = function(dCurrent) {
+                var tickHandler = function(dCurrent) {
                     console.log("DOC " + this.name + " tick: " + dCurrent);
                     element.val(lpad(dCurrent.getMinutes(), 2) + ":" + lpad(dCurrent.getSeconds(), 2));
                     element.button('refresh');
                 }
 
-                countdownTimers[index].completionHandler = function() {
+                var completionHandler = function() {
                     console.log("DOC countdown complete");
                 }
 
                 element.bind("vclick", function(event, ui) {
                 });
+
+                countdownTimers[index] = new CountdownTimer(
+                    "Hand stretch out", 4, completionHandler, tickHandler
+                );
 
                 countdownTimers[index].start();
             })();
@@ -113,11 +110,12 @@
                 var index = 0;
                 var element = $("#repsCounter_"+index);
 
-                counters[index] = new CounterWorkout("Test counter", 3);
-                counters[index].completionHandler = function(reps) {
+                var completionHandler = function(reps) {
                     console.log("DOC reps complete at " + reps);
                     this.reps = 0;
                 }
+
+                counters[index] = new Counter("Test counter", 3, completionHandler);
 
                 element.bind("vclick", function(event, ui) {
                     counters[index].addRep();
