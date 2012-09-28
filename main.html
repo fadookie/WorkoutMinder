@@ -12,6 +12,20 @@
             this.name = name;
             this.reps = 0;
             this.repsMax = repsMax;
+
+            this.addRep = function() {
+                this.reps++;
+                console.log(this.name + " " + this.reps);
+                if (this.reps >= this.repsMax) {
+                    if (this.completionHandler) {
+                        this.completionHandler(this.reps);
+                    }
+                }
+            }
+
+            this.completionHandler = function(reps) {
+                console.log (this.name + " counter complete at" + reps);
+            }
         }
 
         var CountdownTimerWorkout = function(name, sDuration) {
@@ -27,11 +41,20 @@
                 console.log (this.name + " countdown complete");
             }
 
+            this.tickHandler = function(sCurrent) {
+                //console.log(this.name + " tick: " + sCurrent);
+            }
+
+
             this.fCountdown = function() {
                 this.sCurrent--;
                 obj = this;
+
+                if (this.tickHandler) {
+                    this.tickHandler(this.getDate());
+                }
+
                 if (this.sCurrent > 0) {
-                    console.log(this.name + " " + this.sCurrent);
                     setTimeout(function(){obj.fCountdown();}, 1000); //We have to use an upvalue since 'this' will refer to the window when called by setTimeout
                 } else {
                     //console.log(this.name + " reset timer");
@@ -39,6 +62,13 @@
                         this.completionHandler();
                     }
                 }
+            }
+
+            /**
+             * Return relative date until end of timer, for getSeconds() getHours() etc.
+             */
+            this.getDate = function() {
+                return ( new Date(this.sCurrent * 1000) );
             }
         }
 
@@ -50,44 +80,63 @@
         */
     </script>
     <script>
-        var repsCounter = 0;
-        var sCountdownTimer = 0;
-        var countdownCompletionHandler;
-        var sDefaultCountdownDuration = 30;
+        var countdownTimers;
+        var counters;
 
         $(document).bind('pageinit', function() {
-            //$("#repsCounter").buttonMarkup({corners: false});
-            //console.log("repsCounter = " + repsCounter);
+            counters = new Array();
+            countdownTimers = new Array();
 
-            $("#repsCounter").bind("vclick", function(event, ui) {
-                repsCounter++;
-                $("#repsCounter").val(repsCounter);
-                $("#repsCounter").button('refresh');
-            });
 
-            //startCountdown(5);
+            (function() {
+                var index = 0;
+                var element = $("#countdownTimer_"+index);
+                countdownTimers[index] = new CountdownTimerWorkout("Hand stretch out", 4);
 
-            var cdtw1 = new CountdownTimerWorkout("Hand stretch",5);
-            cdtw1.start();
+                countdownTimers[index].tickHandler = function(dCurrent) {
+                    console.log("DOC " + this.name + " tick: " + dCurrent);
+                    element.val(lpad(dCurrent.getMinutes(), 2) + ":" + lpad(dCurrent.getSeconds(), 2));
+                    element.button('refresh');
+                }
+
+                countdownTimers[index].completionHandler = function() {
+                    console.log("DOC countdown complete");
+                }
+
+                element.bind("vclick", function(event, ui) {
+                });
+
+                countdownTimers[index].start();
+            })();
+
+            (function() {
+                var index = 0;
+                var element = $("#repsCounter_"+index);
+
+                counters[index] = new CounterWorkout("Test counter", 3);
+                counters[index].completionHandler = function(reps) {
+                    console.log("DOC reps complete at " + reps);
+                    this.reps = 0;
+                }
+
+                element.bind("vclick", function(event, ui) {
+                    counters[index].addRep();
+                    element.val(counters[index].reps);
+                    element.button('refresh');
+                });
+
+            })();
+
         });
 
-        function startCountdown(sDuration, completionHandler) {
-            if (sDuration) {
-                sCountdownTimer = sDuration;
-            } else {
-                sCountdownTimer = sDefaultCountdownDuration;
-            }
+        function lpad(value, padding) {
+            var zeroes = "0";
 
-            if (completionHandler) {
-                //use supplied handler
-                countdownCompletionHandler = completionHandler;
-            } else {
-                //use default handler
-                countdownCompletionHandler = stopCountdown;
-            }
+            for (var i = 0; i < padding; i++) { zeroes += "0"; }
 
-            countdownTick();
+            return (zeroes + value).slice(padding * -1);
         }
+
     </script>
 </head> 
 <body> 
@@ -100,12 +149,14 @@
 
 	<div data-role="content">	
 		<p>Hello world</p>		
-<input type="button" value="0" id="repsCounter" />
-        <!--<a href="#" data-role="button" data-icon="star" id="repsCounter">0</a>-->
+        <input type="button" data-icon="plus" value="0" id="repsCounter_0" />
+        <input type="button" data-icon="forward" value="0" id="countdownTimer_0" />
+        <!--
         <ul data-role="listview" data-inset="true" data-filter="true">
             <li><a href="#">Test Item 1</a></li>
             <li><a href="#">Test Item 2</a></li>
         </ul>
+        -->
 
 	</div><!-- /content -->
 
